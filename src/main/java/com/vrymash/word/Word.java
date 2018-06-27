@@ -1,12 +1,13 @@
 package com.vrymash.word;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
  * Created by vrymash on 08.01.2015.
  */
-public class Word {
+public abstract class Word {
 
     private Integer blockA = 1000000000; // [0..8]
     private Integer blockB = 1000000000; // [9..17]
@@ -19,10 +20,11 @@ public class Word {
     private Integer checkSumD;
 
     private String word;
+    private Locale locale; // to what language a Word belong
     private Integer errorState = 0;
     private String errorMessage = "";
 
-    private Map<Character, Integer> charToPositionMap = new HashMap();
+    protected Map<Character, Integer> charToPositionMap = new HashMap();
 
     /**
      * Class contains four blocks nine digits per each to describe count of letters in a word.
@@ -35,8 +37,9 @@ public class Word {
      * @param blockB
      * @param blockC
      * @param blockD
+     * @param locale - specifies language for given word.
      */
-    public Word(Integer blockA, Integer blockB, Integer blockC, Integer blockD){
+    public Word(Integer blockA, Integer blockB, Integer blockC, Integer blockD, Locale locale){
         this.blockA = blockA;
         this.blockB = blockB;
         this.blockC = blockC;
@@ -48,6 +51,8 @@ public class Word {
             errorState = 1;
             errorMessage = e.getMessage();
         }
+
+        this.locale = locale;
     }
 
     /**
@@ -58,8 +63,10 @@ public class Word {
      * and errorMessage.
      *
      * @param word - given word which is represented by class. Should be defined and non-empty.
+     *
+     * @param locale - specifies language for given word.
      */
-    public Word(String word)
+    public Word(String word, Locale locale)
     {
         this.word = word;
         try {
@@ -69,6 +76,8 @@ public class Word {
             errorState = 1;
             errorMessage = e.getMessage();
         }
+
+        this.locale = locale;
     }
 
     @Override
@@ -131,6 +140,7 @@ public class Word {
         return checkSumD;
     }
 
+    public String getWord() {return this.word;}
 
     // ****************************************************
     //         private methods
@@ -214,34 +224,13 @@ public class Word {
         return result;
     }
 
-    private void populateCharToPositionMap(){
-        if(charToPositionMap.size() > 0) return;
+    /**
+     * Implementation MUST be specified after inheritance according to specified language.
+     *
+     * This Map includes correlation between a Letter in lowercase and Number which will be saved into DB,
+     * e.g. for en_UK such a correlation for 'g' is following:
+     *      'g' -> 6 (key='g', value=6)
+     */
+    protected abstract void populateCharToPositionMap();
 
-        charToPositionMap.put(new Character('a'),0);
-        charToPositionMap.put(new Character('b'),1);
-        charToPositionMap.put(new Character('c'),2);
-        charToPositionMap.put(new Character('d'),3);
-        charToPositionMap.put(new Character('e'),4);
-        charToPositionMap.put(new Character('f'),5);
-        charToPositionMap.put(new Character('g'),6);
-        charToPositionMap.put(new Character('h'),7);
-        charToPositionMap.put(new Character('i'),8);
-        charToPositionMap.put(new Character('j'),9);
-        charToPositionMap.put(new Character('k'),10);
-        charToPositionMap.put(new Character('l'),11);
-        charToPositionMap.put(new Character('m'),12);
-        charToPositionMap.put(new Character('n'),13);
-        charToPositionMap.put(new Character('o'),14);
-        charToPositionMap.put(new Character('p'),15);
-        charToPositionMap.put(new Character('q'),16);
-        charToPositionMap.put(new Character('r'),17);
-        charToPositionMap.put(new Character('s'),18);
-        charToPositionMap.put(new Character('t'),19);
-        charToPositionMap.put(new Character('u'),20);
-        charToPositionMap.put(new Character('v'),21);
-        charToPositionMap.put(new Character('w'),22);
-        charToPositionMap.put(new Character('x'),23);
-        charToPositionMap.put(new Character('y'),24);
-        charToPositionMap.put(new Character('z'),25);
-    }
 }
